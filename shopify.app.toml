@@ -1,0 +1,31 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "9eb1abcf9adf062226d606d5c2ecb799"
+name = "Cobot Pro"
+handle = "cobot-pro"
+application_url = "https://1779-155-186-72-232.ngrok-free.app/"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2024-04"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,write_checkouts,write_customers,write_orders,write_products"
+
+[auth]
+redirect_urls = [ "https://1779-155-186-72-232.ngrok-free.app/auth/callback" ]
+
+[pos]
+embedded = false
