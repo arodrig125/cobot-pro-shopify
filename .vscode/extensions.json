@@ -1,6 +1,10 @@
 {
   "recommendations": [
     "shopify.polaris-for-vscode",
-    "lokalise.i18n-ally"
+    "lokalise.i18n-ally",
+    "sengokudaikon.vscode-aider-sengoku",
+    "tabnine.tabnine-vscode",
+    "mattflower.aider",
+    "openai.chatgpt"
   ]
 }

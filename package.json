@@ -1,18 +1,13 @@
 {
-  "name": "my-node-app",
+  "name": "cobot-pro",
   "version": "1.0.0",
-  "main": "web/index.js",
-  "license": "UNLICENSED",
+  "type": "module",
   "scripts": {
-    "shopify": "shopify",
-    "build": "shopify app build",
-    "dev": "shopify app dev",
-    "info": "shopify app info",
-    "generate": "shopify app generate",
-    "deploy": "shopify app deploy"
+    "start": "node server.js"
   },
   "dependencies": {
-    "@shopify/app": "^3.0.0",
-    "@shopify/cli": "^3.0.0"
+    "@shopify/shopify-api": "^11.12.0",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0"
   }
 }

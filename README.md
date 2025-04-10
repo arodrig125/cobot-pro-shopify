@@ -1,39 +1,79 @@
-# Shopify App Template for Node
+# Cobot Pro - Shopify Upsell App
 
-This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using Node and React. It contains the basics for building a Shopify app.
+Cobot Pro is a Shopify app that helps merchants increase their average order value by automatically suggesting relevant upsell products to customers during the checkout process.
 
-Rather than cloning this repo, you can use your preferred package manager and the Shopify CLI with [these steps](#installing-the-template).
+## Features
 
-## Benefits
+- **Easy Rule Creation**: Create upsell rules by specifying trigger products and upsell products
+- **Custom Messages**: Add personalized messages for each upsell offer
+- **Simple Management**: View, edit, and delete your upsell rules from a clean dashboard
+- **Seamless Integration**: Works with your existing Shopify store with minimal setup
 
-Shopify apps are built on a variety of Shopify tools to create a great merchant experience. The [create an app](https://shopify.dev/docs/apps/getting-started/create) tutorial in our developer documentation will guide you through creating a Shopify app using this template.
+## Getting Started
 
-The Node app template comes with the following out-of-the-box functionality:
+### Prerequisites
 
-- OAuth: Installing the app and granting permissions
-- GraphQL Admin API: Querying or mutating Shopify admin data
-- REST Admin API: Resource classes to interact with the API
-- Shopify-specific tooling:
-  - AppBridge
-  - Polaris
-  - Webhooks
+1. A Shopify Partner account
+2. A development store or a production store for testing
+3. Node.js and npm installed on your development machine
 
-## Tech Stack
+### Installation
 
-This template combines a number of third party open-source tools:
+1. Clone this repository:
+```bash
+git clone https://github.com/yourusername/cobot-pro.git
+cd cobot-pro
+```
 
-- [Express](https://expressjs.com/) builds the backend.
-- [Vite](https://vitejs.dev/) builds the [React](https://reactjs.org/) frontend.
-- [React Router](https://reactrouter.com/) is used for routing. We wrap this with file-based routing.
-- [React Query](https://react-query.tanstack.com/) queries the Admin API.
-- [`i18next`](https://www.i18next.com/) and related libraries are used to internationalize the frontend.
-  - [`react-i18next`](https://react.i18next.com/) is used for React-specific i18n functionality.
-  - [`i18next-resources-to-backend`](https://github.com/i18next/i18next-resources-to-backend) is used to dynamically load app translations.
-  - [`@formatjs/intl-localematcher`](https://formatjs.io/docs/polyfills/intl-localematcher/) is used to match the user locale with supported app locales.
-  - [`@formatjs/intl-locale`](https://formatjs.io/docs/polyfills/intl-locale) is used as a polyfill for [`Intl.Locale`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale) if necessary.
-  - [`@formatjs/intl-pluralrules`](https://formatjs.io/docs/polyfills/intl-pluralrules) is used as a polyfill for [`Intl.PluralRules`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules) if necessary.
+2. Install dependencies:
+```bash
+npm install
+```
 
-The following Shopify tools complement these third-party tools to ease app development:
+3. Create a `.env` file in the root directory with the following variables:
+```
+SHOPIFY_API_KEY=your_api_key
+SHOPIFY_API_SECRET=your_api_secret
+SCOPES=read_products,write_products
+HOST=your_app_url
+DATABASE_URL=your_database_url
+```
+
+4. Run the development server:
+```bash
+npm run dev
+```
+
+## Usage
+
+### Creating Upsell Rules
+
+1. Navigate to the Cobot Pro app in your Shopify admin
+2. Enter the product ID of the trigger product (the product that will trigger the upsell)
+3. Enter the product ID of the upsell product (the product you want to offer as an upsell)
+4. Add a custom message to display with the upsell offer
+5. Click "Save Rule"
+
+### Managing Upsell Rules
+
+- View all your upsell rules in the dashboard
+- Delete rules by clicking the delete icon next to the rule
+
+## Database Schema
+
+The app uses a database to store upsell rules with the following schema:
+
+```prisma
+model Upsell {
+  id              Int      @id @default(autoincrement())
+  triggerProductId String
+  upsellProductId  String
+  message          String   @default("")
+  createdAt        DateTime @default(now())
+}
+```
+
+## API Endpoints
 
 - [Shopify API library](https://github.com/Shopify/shopify-node-api) adds OAuth to the Express backend. This lets users install the app and grant scope permissions.
 - [App Bridge React](https://shopify.dev/docs/apps/tools/app-bridge/getting-started/using-react) adds [authentication to API requests](https://shopify.dev/docs/api/app-bridge-library/apis/resource-fetching) in the frontend and renders components outside of the App’s iFrame.

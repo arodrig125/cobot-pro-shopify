@@ -1,0 +1,25 @@
+{
+  "name": "cobot-pro",
+  "version": "1.0.0",
+  "description": "Cobot Pro - Shopify Upsell App",
+  "main": "web/server.js",
+  "scripts": {
+    "dev": "node web/server.js",
+    "start": "node web/server.js"
+  },
+  "keywords": [
+    "shopify",
+    "upsell",
+    "express",
+    "api"
+  ],
+  "author": "arod",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "@prisma/client": "^5.8.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.8.1"
+  }
+}

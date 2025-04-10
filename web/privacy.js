@@ -1,86 +1,109 @@
 import { DeliveryMethod } from "@shopify/shopify-api";
+import prisma from "./prismaClient";
 
 /**
- * @type {{[key: string]: import("@shopify/shopify-api").WebhookHandler}}
+ * Shopify GDPR Webhooks
+ * Handles customer data requests, deletions, etc.
  */
+const parsePayload = (body) => {
+  try {
+    return JSON.parse(body);
+  } catch (error) {
+    console.error("❌ Failed to parse webhook payload:", error);
+    return null;
+  }
+};
+
 export default {
-  /**
-   * Customers can request their data from a store owner. When this happens,
-   * Shopify invokes this privacy webhook.
-   *
-   * https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#customers-data_request
-   */
   CUSTOMERS_DATA_REQUEST: {
     deliveryMethod: DeliveryMethod.Http,
-    callbackUrl: "/api/webhooks",
+    callbackUrl: "/api/webhooks/customers-data-request",
     callback: async (topic, shop, body, webhookId) => {
-      const payload = JSON.parse(body);
-      // Payload has the following shape:
-      // {
-      //   "shop_id": 954889,
-      //   "shop_domain": "{shop}.myshopify.com",
-      //   "orders_requested": [
-      //     299938,
-      //     280263,
-      //     220458
-      //   ],
-      //   "customer": {
-      //     "id": 191167,
-      //     "email": "john@example.com",
-      //     "phone": "555-625-1199"
-      //   },
-      //   "data_request": {
-      //     "id": 9999
-      //   }
-      // }
+      const payload = parsePayload(body);
+      if (!payload) return;
+
+      console.log("🔐 Customer Data Request received:", {
+        shop,
+        webhookId,
+        payload,
+      });
+
+      const { customer } = payload;
+      const { id } = customer;
+
+      // Log the data request in the database
+      try {
+        await prisma.customerDataRequest.create({
+          data: {
+            customerId: id,
+            shop: shop,
+          },
+        });
+      } catch (error) {
+        console.error("❌ Failed to log customer data request:", error);
+      }
+      // TODO: Handle data request (e.g., export customer data, log it, etc.)
     },
   },
 
-  /**
-   * Store owners can request that data is deleted on behalf of a customer. When
-   * this happens, Shopify invokes this privacy webhook.
-   *
-   * https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#customers-redact
-   */
   CUSTOMERS_REDACT: {
     deliveryMethod: DeliveryMethod.Http,
-    callbackUrl: "/api/webhooks",
+    callbackUrl: "/api/webhooks/customers-redact",
     callback: async (topic, shop, body, webhookId) => {
-      const payload = JSON.parse(body);
-      // Payload has the following shape:
-      // {
-      //   "shop_id": 954889,
-      //   "shop_domain": "{shop}.myshopify.com",
-      //   "customer": {
-      //     "id": 191167,
-      //     "email": "john@example.com",
-      //     "phone": "555-625-1199"
-      //   },
-      //   "orders_to_redact": [
-      //     299938,
-      //     280263,
-      //     220458
-      //   ]
-      // }
+      const payload = parsePayload(body);
+      if (!payload) return;
+
+      console.log("🗑️ Customer Redact received:", {
+        shop,
+        webhookId,
+        payload,
+      });
+
+      const { customer } = payload;
+      const { id } = customer;
+
+      // Log the customer deletion in the database
+      try {
+        await prisma.customerRedact.create({
+          data: {
+            customerId: id,
+            shop: shop,
+          },
+        });
+      } catch (error) {
+        console.error("❌ Failed to log customer deletion:", error);
+      }
+      // TODO: Handle customer deletion cleanup here
     },
   },
 
-  /**
-   * 48 hours after a store owner uninstalls your app, Shopify invokes this
-   * privacy webhook.
-   *
-   * https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#shop-redact
-   */
   SHOP_REDACT: {
     deliveryMethod: DeliveryMethod.Http,
-    callbackUrl: "/api/webhooks",
+    callbackUrl: "/api/webhooks/shop-redact",
     callback: async (topic, shop, body, webhookId) => {
-      const payload = JSON.parse(body);
-      // Payload has the following shape:
-      // {
-      //   "shop_id": 954889,
-      //   "shop_domain": "{shop}.myshopify.com"
-      // }
+      const payload = parsePayload(body);
+      if (!payload) return;
+
+      console.log("🏪 Shop Redact received:", {
+        shop,
+        webhookId,
+        payload,
+      });
+
+      const { shop_id } = payload;
+
+      // Log the shop deletion in the database
+      try {
+        await prisma.shopRedact.create({
+          data: {
+            shopId: shop_id,
+            shop: shop,
+          },
+        });
+      } catch (error) {
+        console.error("❌ Failed to log shop deletion:", error);
+      }
+      // TODO: Clean up shop data from your database if needed
     },
   },
 };

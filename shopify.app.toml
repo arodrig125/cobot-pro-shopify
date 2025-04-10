@@ -1,3 +1,4 @@
-# This file stores configurations for your Shopify app.
-
-scopes = "write_products"
+name = "Cobot Pro"
+api_key = "9eb1abcf9adf062226d606d5c2ecb799"
+application_url = "1779-155-186-72-232.ngrok-free.app"
+embedded = true

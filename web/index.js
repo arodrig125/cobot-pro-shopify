@@ -1,86 +1,35 @@
-// @ts-check
-import { join } from "path";
-import { readFileSync } from "fs";
-import express from "express";
-import serveStatic from "serve-static";
-
-import shopify from "./shopify.js";
-import productCreator from "./product-creator.js";
-import PrivacyWebhookHandlers from "./privacy.js";
-
-const PORT = parseInt(
-  process.env.BACKEND_PORT || process.env.PORT || "3000",
-  10
-);
-
-const STATIC_PATH =
-  process.env.NODE_ENV === "production"
-    ? `${process.cwd()}/frontend/dist`
-    : `${process.cwd()}/frontend/`;
-
-const app = express();
-
-// Set up Shopify authentication and webhook handling
-app.get(shopify.config.auth.path, shopify.auth.begin());
-app.get(
-  shopify.config.auth.callbackPath,
-  shopify.auth.callback(),
-  shopify.redirectToShopifyOrAppRoot()
-);
-app.post(
-  shopify.config.webhooks.path,
-  shopify.processWebhooks({ webhookHandlers: PrivacyWebhookHandlers })
-);
-
-// If you are adding routes outside of the /api path, remember to
-// also add a proxy rule for them in web/frontend/vite.config.js
-
-app.use("/api/*", shopify.validateAuthenticatedSession());
-
-app.use(express.json());
-
-app.get("/api/products/count", async (_req, res) => {
-  const client = new shopify.api.clients.Graphql({
-    session: res.locals.shopify.session,
-  });
-
-  const countData = await client.request(`
-    query shopifyProductCount {
-      productsCount {
-        count
-      }
-    }
-  `);
-
-  res.status(200).send({ count: countData.data.productsCount.count });
-});
-
-app.post("/api/products", async (_req, res) => {
-  let status = 200;
-  let error = null;
-
+/app.post("/api/billing/subscribe", async (req, res) => {
   try {
-    await productCreator(res.locals.shopify.session);
-  } catch (e) {
-    console.log(`Failed to process products/create: ${e.message}`);
-    status = 500;
-    error = e.message;
+    const { shop } = req.body;
+    if (!shop) {
+      throw new Error("Shop is required");
+    }
+
+    const session = res.locals.shopify.session;
+    if (!session) {
+      throw new Error("Shopify session is missing");
+    }
+
+    const client = new shopify.clients.Rest({
+      session,
+    });
+
+    const response = await client.post({
+      path: "recurring_application_charges",
+      data: {how do thes
+        recurring_application_charge: {
+          name: "Pro Plan",
+          price: 9.99,
+          return_url: `${process.env.HOST}/billing/callback`,
+          test: process.env.NODE_ENV !== "production",
+        },
+      },
+      type: "application/json",
+    });
+
+    res.status(200).send({ success: true, confirmationUrl: response.body.recurring_application_charge.confirmation_url });
+  } catch (error) {
+    console.error("Billing subscription failed:", error);
+    res.status(500).send({ success: false, error: error.message });
   }
-  res.status(status).send({ success: status === 200, error });
 });
-
-app.use(shopify.cspHeaders());
-app.use(serveStatic(STATIC_PATH, { index: false }));
-
-app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
-  return res
-    .status(200)
-    .set("Content-Type", "text/html")
-    .send(
-      readFileSync(join(STATIC_PATH, "index.html"))
-        .toString()
-        .replace("%VITE_SHOPIFY_API_KEY%", process.env.SHOPIFY_API_KEY || "")
-    );
-});
-
-app.listen(PORT);
