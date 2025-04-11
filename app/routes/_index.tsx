@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => [{ title: "Upsell Pro - Shopify App" }];
@@ -8,6 +8,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // Check if there's a shop parameter in the URL
   const url = new URL(request.url);
   const shop = url.searchParams.get("shop");
+
+  // Check if we should redirect to the app
+  // This is useful for users who are already logged in
+  // or for redirecting from the root to the app
+  const redirectToApp = url.searchParams.get("redirect") === "app";
+
+  if (redirectToApp && shop) {
+    return redirect(`/app?shop=${shop}`);
+  }
 
   return json({ shop });
 }
