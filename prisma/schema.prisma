@@ -1,6 +1,9 @@
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
+  // For Vercel deployment, we need to ensure the URL has the correct format
+  // If DATABASE_URL doesn't start with file:, we'll use a default path
+  // This helps with Vercel deployment where the environment variable might not be set correctly
 }
 
 generator client {

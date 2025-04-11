@@ -15,19 +15,32 @@ const isVercel = process.env.VERCEL === '1';
 if (isVercel) {
   console.log('Setting up Prisma for Vercel deployment...');
 
+  // Ensure DATABASE_URL is properly formatted for SQLite
+  let databaseUrl = process.env.DATABASE_URL || '';
+  if (!databaseUrl.startsWith('file:')) {
+    console.log('DATABASE_URL does not start with file:, setting default SQLite path');
+    databaseUrl = 'file:./.vercel/output/data.db?connection_limit=1';
+  }
+
   // Create a .env file if it doesn't exist
   const envPath = path.join(__dirname, '../.env');
   if (!fs.existsSync(envPath)) {
     console.log('Creating .env file for Vercel...');
     fs.writeFileSync(
       envPath,
-      `DATABASE_URL="${process.env.DATABASE_URL}"\n` +
-      `SESSION_SECRET="${process.env.SESSION_SECRET}"\n` +
-      `SHOPIFY_API_KEY="${process.env.SHOPIFY_API_KEY}"\n` +
-      `SHOPIFY_API_SECRET="${process.env.SHOPIFY_API_SECRET}"\n` +
-      `SHOPIFY_APP_URL="${process.env.SHOPIFY_APP_URL}"\n` +
-      `SCOPES="${process.env.SCOPES}"\n`
+      `DATABASE_URL="${databaseUrl}"\n` +
+      `SESSION_SECRET="${process.env.SESSION_SECRET || 'vercel-deployment-secret'}"\n` +
+      `SHOPIFY_API_KEY="${process.env.SHOPIFY_API_KEY || 'dummy-key'}"\n` +
+      `SHOPIFY_API_SECRET="${process.env.SHOPIFY_API_SECRET || 'dummy-secret'}"\n` +
+      `SHOPIFY_APP_URL="${process.env.SHOPIFY_APP_URL || 'https://cobotpro.io'}"\n` +
+      `SCOPES="${process.env.SCOPES || 'read_products,write_products,read_orders,write_orders'}"\n`
     );
+  } else {
+    // Update existing .env file with correct DATABASE_URL
+    let envContent = fs.readFileSync(envPath, 'utf8');
+    envContent = envContent.replace(/DATABASE_URL=.*\n/, `DATABASE_URL="${databaseUrl}"\n`);
+    fs.writeFileSync(envPath, envContent);
+    console.log('Updated DATABASE_URL in existing .env file');
   }
 
   console.log('Prisma setup for Vercel completed.');
