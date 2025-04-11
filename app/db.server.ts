@@ -6,16 +6,23 @@ import { singleton } from "./singleton.server";
 const DATABASE_URL = process.env.DATABASE_URL;
 invariant(DATABASE_URL, "DATABASE_URL must be set in environment variables.");
 
-// For Vercel deployment with SQLite, we need to handle the database connection differently
+// For Vercel deployment, we'll use Postgres
 let prismaOptions = {};
 
-// If we're using SQLite and in production (Vercel), use in-memory database
-if (DATABASE_URL.startsWith('file:') && process.env.NODE_ENV === 'production') {
-  console.log('Using in-memory SQLite database for Vercel deployment');
+// If we're in production (Vercel), add connection pooling options
+if (process.env.NODE_ENV === 'production') {
+  console.log('Using Postgres database for Vercel deployment');
   prismaOptions = {
     datasources: {
       db: {
-        url: 'file::memory:?cache=shared'
+        url: DATABASE_URL
+      }
+    },
+    // Add connection pooling for better performance
+    connection: {
+      options: {
+        min: 1,
+        max: 10
       }
     }
   };

@@ -14,21 +14,20 @@ try {
   process.exit(1);
 }
 
-// For Vercel deployment, we need to handle SQLite differently
+// For Vercel deployment with Postgres
 console.log('Setting up database for Vercel deployment...');
 
-// Check if we're using SQLite
+// Check if DATABASE_URL is set
 const databaseUrl = process.env.DATABASE_URL || '';
-const isSqlite = databaseUrl.startsWith('file:');
 
-if (isSqlite && process.env.VERCEL_ENV === 'production') {
-  console.log('Using SQLite in production (Vercel) - switching to in-memory database');
-  process.env.DATABASE_URL = 'file::memory:?cache=shared';
+if (!databaseUrl) {
+  console.error('DATABASE_URL is not set. Please set it in your Vercel environment variables.');
+  process.exit(1);
+}
 
-  // Skip migrations for in-memory database
-  console.log('Skipping migrations for in-memory database');
-} else if (process.env.VERCEL_ENV === 'production') {
-  console.log('Running Prisma migrations...');
+// Run migrations in production
+if (process.env.VERCEL_ENV === 'production') {
+  console.log('Running Prisma migrations for Postgres...');
   try {
     execSync('npx prisma migrate deploy', { stdio: 'inherit' });
   } catch (error) {

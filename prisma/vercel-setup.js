@@ -15,11 +15,11 @@ const isVercel = process.env.VERCEL === '1';
 if (isVercel) {
   console.log('Setting up Prisma for Vercel deployment...');
 
-  // Ensure DATABASE_URL is properly formatted for SQLite
-  let databaseUrl = process.env.DATABASE_URL || '';
-  if (!databaseUrl.startsWith('file:')) {
-    console.log('DATABASE_URL does not start with file:, setting default SQLite path');
-    databaseUrl = 'file:./.vercel/output/data.db?connection_limit=1';
+  // Verify DATABASE_URL is set for Postgres
+  const databaseUrl = process.env.DATABASE_URL || '';
+  if (!databaseUrl) {
+    console.error('DATABASE_URL is not set. Please set it in your Vercel environment variables.');
+    process.exit(1);
   }
 
   // Create a .env file if it doesn't exist
@@ -33,7 +33,7 @@ if (isVercel) {
       `SHOPIFY_API_KEY="${process.env.SHOPIFY_API_KEY || 'dummy-key'}"\n` +
       `SHOPIFY_API_SECRET="${process.env.SHOPIFY_API_SECRET || 'dummy-secret'}"\n` +
       `SHOPIFY_APP_URL="${process.env.SHOPIFY_APP_URL || 'https://cobotpro.io'}"\n` +
-      `SCOPES="${process.env.SCOPES || 'read_products,write_products,read_orders,write_orders'}"\n`
+      `SCOPES="${process.env.SCOPES || 'read_products,write_products,read_orders,write_orders,read_customers,write_customers'}"\n`
     );
   } else {
     // Update existing .env file with correct DATABASE_URL
