@@ -1,23 +1,24 @@
-# Remix Indie Stack
+# Upsell Pro - Shopify App
 
-![The Remix Indie Stack](https://repository-images.githubusercontent.com/465928257/a241fa49-bd4d-485a-a2a5-5cb8e4ee0abf)
+A Shopify app that helps merchants boost revenue with smart upsell offers.
 
-Learn more about [Remix Stacks](https://remix.run/stacks).
+## Features
 
-```sh
-npx create-remix@latest --template remix-run/indie-stack
-```
+- Create and manage upsell offers
+- Customize appearance and display locations
+- Track performance with detailed analytics
+- Seamless integration with Shopify stores
 
 ## What's in the stack
 
-- [Fly app deployment](https://fly.io) with [Docker](https://www.docker.com/)
-- Production-ready [SQLite Database](https://sqlite.org)
-- Healthcheck endpoint for [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
-- [GitHub Actions](https://github.com/features/actions) for deploy on merge to production and staging environments
-- Email/Password Authentication with [cookie-based sessions](https://remix.run/utils/sessions#md-createcookiesessionstorage)
+- [Remix](https://remix.run) for the framework
 - Database ORM with [Prisma](https://prisma.io)
 - Styling with [Tailwind](https://tailwindcss.com/)
+- [Shopify API](https://shopify.dev/api) integration
+- Email/Password Authentication with [cookie-based sessions](https://remix.run/utils/sessions#md-createcookiesessionstorage)
 - End-to-end testing with [Cypress](https://cypress.io)
+- [Vercel deployment](#vercel-deployment) (primary)
+- [Fly.io deployment](#fly-deployment) (alternative)
 - Local third party request mocking with [MSW](https://mswjs.io)
 - Unit testing with [Vitest](https://vitest.dev) and [Testing Library](https://testing-library.com)
 - Code formatting with [Prettier](https://prettier.io)
@@ -63,19 +64,32 @@ This is a pretty simple note-taking app, but it's a good example of how you can 
 
 ## Deployment
 
-This Remix Stack comes with two GitHub Actions that handle automatically deploying your app to production and staging environments.
+### Vercel Deployment
 
-Prior to your first deployment, you'll need to do a few things:
+This app is configured for deployment on Vercel. To deploy:
 
-- [Install Fly](https://fly.io/docs/getting-started/installing-flyctl/)
+1. Push your code to a GitHub repository
+2. Connect the repository to Vercel
+3. Configure the following environment variables in Vercel:
+   - `DATABASE_URL`: Your database connection string
+   - `SESSION_SECRET`: A random string for session encryption
+   - `SHOPIFY_API_KEY`: Your Shopify API key
+   - `SHOPIFY_API_SECRET`: Your Shopify API secret
+   - `SHOPIFY_APP_URL`: Your app's URL (provided by Vercel)
+   - `SCOPES`: Shopify API scopes needed by your app
 
-- Sign up and log in to Fly
+**Important Note for Production:**
+For production deployment on Vercel, you should use a hosted database service like:
+- PlanetScale (MySQL)
+- Supabase (PostgreSQL)
+- Neon (PostgreSQL)
+- MongoDB Atlas
 
-  ```sh
-  fly auth signup
-  ```
+Update your `prisma/schema.prisma` file to use the appropriate database provider.
 
-  > **Note:** If you have more than one Fly account, ensure that you are signed into the same account in the Fly CLI as you are in the browser. In your terminal, run `fly auth whoami` and ensure the email matches the Fly account signed into the browser.
+### Fly.io Deployment (Alternative)
+
+This app is also configured for deployment on Fly.io. To deploy to Fly.io:
 
 - Create two apps on Fly, one for staging and one for production:
 

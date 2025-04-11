@@ -16,6 +16,7 @@ model User {
 
   password Password?
   notes    Note[]
+  shops    Shop[]
 }
 
 model Password {
@@ -35,4 +36,71 @@ model Note {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
+}
+
+// Shopify Models
+model Shop {
+  id          String @id @default(cuid())
+  shopifyDomain String @unique
+  accessToken String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId      String
+
+  upsellOffers UpsellOffer[]
+  settings     ShopSettings?
+}
+
+model UpsellOffer {
+  id          String @id @default(cuid())
+  name        String
+  type        String // product, service, bundle
+
+  triggerProductId String?
+  triggerCategory  String?
+  upsellProductId  String
+
+  discount     Float? // percentage discount
+  active       Boolean @default(true)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  shop         Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  shopId       String
+
+  analytics    OfferAnalytics?
+}
+
+model OfferAnalytics {
+  id            String @id @default(cuid())
+  impressions   Int @default(0)
+  clicks        Int @default(0)
+  conversions   Int @default(0)
+  revenue       Float @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  upsellOffer   UpsellOffer @relation(fields: [upsellOfferId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  upsellOfferId String @unique
+}
+
+model ShopSettings {
+  id              String @id @default(cuid())
+  displayLocation String @default("cart_page") // product_page, cart_page, checkout_page, thank_you_page
+  maxOffersPerPage Int @default(2)
+  offerStyle      String @default("modal") // inline, modal, sidebar, notification
+  autoApplyDiscount Boolean @default(true)
+  showDiscountBadge Boolean @default(true)
+  enableAnalytics Boolean @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  shopId          String   @unique
 }

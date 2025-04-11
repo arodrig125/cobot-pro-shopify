@@ -7,12 +7,20 @@
 import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
+import { ShopifyProvider } from "./components/ShopifyProvider";
+
+// Set Shopify API key for App Bridge
+if (typeof window !== "undefined") {
+  window.shopifyApiKey = process.env.SHOPIFY_API_KEY;
+}
 
 startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      <RemixBrowser />
+      <ShopifyProvider>
+        <RemixBrowser />
+      </ShopifyProvider>
     </StrictMode>,
   );
 });

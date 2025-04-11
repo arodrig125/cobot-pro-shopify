@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "remix build",
+    "vercel-build": "node ./vercel-build.js",
     "dev": "remix dev -c \"npm run dev:serve\"",
     "dev:serve": "NODE_OPTIONS=\"--import ./mocks/index.js\" remix-serve ./build/index.js",
     "format": "prettier --write .",
@@ -30,6 +31,10 @@
     "@remix-run/node": "^2.16.4",
     "@remix-run/react": "^2.16.4",
     "@remix-run/serve": "^2.16.4",
+    "@shopify/app-bridge": "^3.7.10",
+    "@shopify/app-bridge-react": "^4.1.8",
+    "@shopify/polaris": "^13.9.5",
+    "@shopify/shopify-api": "^11.12.0",
     "bcryptjs": "^2.4.3",
     "isbot": "^5.1.17",
     "react": "^18.3.1",
