@@ -3,7 +3,7 @@
 // This script is used by Vercel to build the application
 // It ensures that Prisma migrations are run before the build
 
-const { execSync } = require('child_process');
+import { execSync } from 'child_process';
 
 // Run Vercel-specific Prisma setup
 console.log('Running Vercel-specific Prisma setup...');
