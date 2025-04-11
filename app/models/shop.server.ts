@@ -1,9 +1,17 @@
 import type { Shop, User } from "@prisma/client";
 import { prisma } from "~/db.server";
+import { findDemoData, isDemoMode } from "~/utils/demo-db.server";
 
 export type { Shop } from "@prisma/client";
 
 export async function getShopByDomain(shopifyDomain: Shop["shopifyDomain"]) {
+  // If in demo mode, return demo data
+  if (isDemoMode()) {
+    console.log('Using demo data for getShopByDomain');
+    return findDemoData('shops', { shopifyDomain });
+  }
+
+  // Otherwise use real database
   return prisma.shop.findUnique({
     where: { shopifyDomain },
     include: { settings: true }

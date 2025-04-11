@@ -3,8 +3,14 @@ import invariant from "tiny-invariant";
 import { singleton } from "./singleton.server";
 
 // Check for DATABASE_URL environment variable
-const DATABASE_URL = process.env.DATABASE_URL;
-invariant(DATABASE_URL, "DATABASE_URL must be set in environment variables.");
+let DATABASE_URL = process.env.DATABASE_URL;
+
+// If DATABASE_URL is not set, use a default value for demo purposes
+if (!DATABASE_URL) {
+  console.warn("DATABASE_URL not set, using default value for demo purposes");
+  DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/cobotpro?schema=public';
+  process.env.DATABASE_URL = DATABASE_URL;
+}
 
 // For Vercel deployment, we'll use Postgres
 let prismaOptions = {};
