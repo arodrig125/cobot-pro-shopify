@@ -1,34 +1,14 @@
-import { LoaderFunctionArgs, json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import { shopify } from "~/lib/shopify.server";
-import invariant from "tiny-invariant";
-import { getShopByDomain } from "~/models/shop.server";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const shopDomain = url.searchParams.get("shop");
-
-  invariant(shopDomain, "No shop provided");
-
-  // Verify the shop is authenticated
-  try {
-    // Check if we have a session in Shopify
-    const sessionId = await shopify.session.getOfflineId(shopDomain);
-    if (!sessionId) {
-      return redirect(`/auth?shop=${shopDomain}`);
+// Simple loader that returns demo data
+export async function loader() {
+  return json({
+    shop: {
+      id: "demo-shop-1",
+      shopifyDomain: "demo-shop.myshopify.com"
     }
-
-    // Get the shop from our database
-    const shopData = await getShopByDomain(shopDomain);
-    if (!shopData) {
-      return redirect(`/auth?shop=${shopDomain}`);
-    }
-
-    return json({ shop: shopData });
-  } catch (error) {
-    console.error("Error verifying shop:", error);
-    return redirect(`/auth?shop=${shopDomain}`);
-  }
+  });
 }
 
 export default function AppLayout() {
@@ -39,7 +19,10 @@ export default function AppLayout() {
     <div className="flex h-full min-h-screen flex-col">
       <header className="flex items-center justify-between bg-blue-600 p-4 text-white">
         <h1 className="text-3xl font-bold">Upsell Pro</h1>
-        <p>Shop: {shopDomain}</p>
+        <div className="flex items-center">
+          <span className="bg-yellow-400 text-blue-800 text-xs font-bold px-2 py-1 rounded mr-3">DEMO MODE</span>
+          <p>Shop: {shopDomain}</p>
+        </div>
       </header>
 
       <main className="flex h-full bg-white">

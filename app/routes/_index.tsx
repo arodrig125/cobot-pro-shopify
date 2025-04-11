@@ -1,39 +1,11 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { setupVercelDatabase } from "~/utils/vercel-db-setup.server";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import type { MetaFunction } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 
 export const meta: MetaFunction = () => [{ title: "Upsell Pro - Shopify App" }];
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  // For Vercel deployment, set up the database
-  if (process.env.NODE_ENV === 'production') {
-    try {
-      await setupVercelDatabase();
-    } catch (error) {
-      console.error('Error setting up database:', error);
-      // Continue anyway, as we don't want to block the landing page
-    }
-  }
-
-  // Check if there's a shop parameter in the URL
-  const url = new URL(request.url);
-  const shop = url.searchParams.get("shop");
-
-  // Check if we should redirect to the app
-  // This is useful for users who are already logged in
-  // or for redirecting from the root to the app
-  const redirectToApp = url.searchParams.get("redirect") === "app";
-
-  if (redirectToApp && shop) {
-    return redirect(`/app?shop=${shop}`);
-  }
-
-  return json({ shop });
-}
+// No loader needed for the simplified version
 
 export default function Index() {
-  const { shop } = useLoaderData<typeof loader>();
 
   return (
     <main className="relative min-h-screen bg-white">
@@ -45,30 +17,12 @@ export default function Index() {
               <p className="text-xl md:text-2xl mb-8">Boost your store's revenue with smart upsell offers</p>
               <p className="text-lg mb-6">Automatically suggest relevant products to your customers at the perfect moment in their shopping journey.</p>
 
-              {shop ? (
-                <Link
-                  to={`/auth?shop=${shop}`}
-                  className="inline-block bg-white text-blue-600 font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-50 transition duration-200"
-                >
-                  Install App
-                </Link>
-              ) : (
-                <Form method="get" action="/auth" className="flex">
-                  <input
-                    type="text"
-                    name="shop"
-                    placeholder="your-store.myshopify.com"
-                    className="py-3 px-4 rounded-l-lg w-64 text-gray-800 focus:outline-none"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    className="bg-white text-blue-600 font-bold py-3 px-6 rounded-r-lg hover:bg-blue-50 transition duration-200"
-                  >
-                    Install App
-                  </button>
-                </Form>
-              )}
+              <div className="inline-block bg-white text-blue-600 font-bold py-3 px-6 rounded-lg shadow-lg">
+                Demo Mode - Vercel Deployment
+              </div>
+              <p className="mt-4 text-sm text-white">
+                This is a demo deployment. To use the full app, please set up proper environment variables in Vercel.
+              </p>
             </div>
 
             <div className="md:w-1/2">
@@ -171,22 +125,13 @@ export default function Index() {
             </div>
 
             <div>
-              {shop ? (
-                <Link
-                  to={`/auth?shop=${shop}`}
-                  className="inline-block bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200"
-                >
-                  Install App
-                </Link>
-              ) : (
-                <Link
-                  to="#top"
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="inline-block bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200"
-                >
-                  Get Started
-                </Link>
-              )}
+              <Link
+                to="#top"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="inline-block bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200"
+              >
+                Demo Mode
+              </Link>
             </div>
           </div>
 
