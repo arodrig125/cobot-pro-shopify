@@ -14,8 +14,20 @@ try {
   process.exit(1);
 }
 
-// Run Prisma migrations if not in preview environment
-if (process.env.VERCEL_ENV === 'production') {
+// For Vercel deployment, we need to handle SQLite differently
+console.log('Setting up database for Vercel deployment...');
+
+// Check if we're using SQLite
+const databaseUrl = process.env.DATABASE_URL || '';
+const isSqlite = databaseUrl.startsWith('file:');
+
+if (isSqlite && process.env.VERCEL_ENV === 'production') {
+  console.log('Using SQLite in production (Vercel) - switching to in-memory database');
+  process.env.DATABASE_URL = 'file::memory:?cache=shared';
+
+  // Skip migrations for in-memory database
+  console.log('Skipping migrations for in-memory database');
+} else if (process.env.VERCEL_ENV === 'production') {
   console.log('Running Prisma migrations...');
   try {
     execSync('npx prisma migrate deploy', { stdio: 'inherit' });
@@ -23,7 +35,6 @@ if (process.env.VERCEL_ENV === 'production') {
     console.error('Error running Prisma migrations:', error);
     console.log('Continuing despite migration error - will attempt to generate client');
     // Don't exit on migration error, as we might still be able to generate the client
-    // process.exit(1);
   }
 } else {
   console.log('Skipping Prisma migrations in preview environment');

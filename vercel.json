@@ -5,7 +5,8 @@
   "framework": "remix",
   "outputDirectory": "public",
   "env": {
-    "PRISMA_GENERATE_DATAPROXY": "true"
+    "PRISMA_GENERATE_DATAPROXY": "true",
+    "NODE_ENV": "production"
   },
   "redirects": [
     {
@@ -18,5 +19,11 @@
       "destination": "/",
       "permanent": true
     }
-  ]
+  ],
+  "functions": {
+    "api/*": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
 }

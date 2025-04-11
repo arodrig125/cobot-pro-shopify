@@ -1,10 +1,21 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
+import { setupVercelDatabase } from "~/utils/vercel-db-setup.server";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => [{ title: "Upsell Pro - Shopify App" }];
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  // For Vercel deployment, set up the database
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      await setupVercelDatabase();
+    } catch (error) {
+      console.error('Error setting up database:', error);
+      // Continue anyway, as we don't want to block the landing page
+    }
+  }
+
   // Check if there's a shop parameter in the URL
   const url = new URL(request.url);
   const shop = url.searchParams.get("shop");
