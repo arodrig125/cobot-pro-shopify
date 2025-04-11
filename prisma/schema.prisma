@@ -55,6 +55,7 @@ model Shop {
 
   upsellOffers UpsellOffer[]
   settings     ShopSettings?
+  integrations Integration[]
 }
 
 model UpsellOffer {
@@ -106,4 +107,19 @@ model ShopSettings {
 
   shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   shopId          String   @unique
+}
+
+model Integration {
+  id              String @id @default(cuid())
+  type            String // mailchimp, klaviyo, google_analytics, facebook_pixel, segment, shopify_customer_tags
+  category        String // email, analytics, customerData
+  name            String
+  connected       Boolean @default(false)
+  settings        String? // JSON string for integration settings
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  shopId          String
 }

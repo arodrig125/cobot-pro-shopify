@@ -70,6 +70,14 @@ export default function AppLayout() {
                   Settings
                 </Link>
               </li>
+              <li className="mb-2">
+                <Link
+                  to={`/app/integrations?shop=${shopDomain}`}
+                  className="block rounded-md p-2 hover:bg-gray-200"
+                >
+                  Integrations
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
